@@ -15,7 +15,9 @@
   "engines": {
     "atom": ">=1.0.0 <2.0.0"
   },
-  "dependencies": {},
+  "dependencies": {
+    "recast": "^0.15.0"
+  },
   "bugs": {
     "url": "https://github.com/atom/source-traverse/issues"
   },
