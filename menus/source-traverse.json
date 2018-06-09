@@ -1,0 +1,26 @@
+{
+  "context-menu": {
+    "atom-text-editor": [
+      {
+        "label": "Toggle source-traverse",
+        "command": "source-traverse:toggle"
+      }
+    ]
+  },
+  "menu": [
+    {
+      "label": "Packages",
+      "submenu": [
+        {
+          "label": "Source Traverse",
+          "submenu": [
+            {
+              "label": "Toggle",
+              "command": "source-traverse:toggle"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
