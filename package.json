@@ -16,6 +16,7 @@
     "atom": ">=1.0.0 <2.0.0"
   },
   "dependencies": {
+    "babylon": "^6.18.0",
     "recast": "^0.15.0"
   },
   "bugs": {
