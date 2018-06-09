@@ -3,16 +3,28 @@
   "main": "./lib/source-traverse",
   "version": "0.0.0",
   "description": "A short description of your package",
-  "keywords": [
-  ],
+  "keywords": [],
   "activationCommands": {
     "atom-workspace": "source-traverse:toggle"
   },
-  "repository": "https://github.com/atom/source-traverse",
-  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/atom/source-traverse.git"
+  },
+  "license": "BSD-3-Clause",
   "engines": {
     "atom": ">=1.0.0 <2.0.0"
   },
-  "dependencies": {
-  }
+  "dependencies": {},
+  "bugs": {
+    "url": "https://github.com/atom/source-traverse/issues"
+  },
+  "homepage": "https://github.com/atom/source-traverse#readme",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": ""
 }
