@@ -3,9 +3,11 @@ import { CompositeDisposable } from 'atom';
 import recast from 'recast';
 
 function foo () {}
-function bar () {}
+ function bar () {}
 function baz () {}
-class Biz {}
+class Biz {
+  constructor() {}
+}
 
 const nodesToVisit = [
   'ClassDeclaration',
@@ -129,16 +131,20 @@ export default {
 
   _onItemActivate(node) {
     if (node.loc) {
-      const {
-        start,
-        end,
-      } = node.loc;
-      if (this._activeEditor) {
-        this._activeEditor.setSelectedScreenRange([
-          [start.line - 1, start.column],
-          [end.line - 1, end.column],
-        ]);
-      }
+      this._selectLoc(node.loc);
+    }
+  },
+
+  _selectLoc(loc) {
+    const {
+      start,
+      end,
+    } = loc;
+    if (this._activeEditor) {
+      this._activeEditor.setSelectedScreenRange([
+        [start.line - 1, start.column],
+        [end.line - 1, end.column],
+      ]);
     }
   }
 };

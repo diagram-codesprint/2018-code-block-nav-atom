@@ -6,7 +6,7 @@ import EventEmitter from './util/eventEmitter';
 import FunctionDeclaration from './ui/FunctionDeclaration';
 import NodeGroup from './ui/NodeGroup';
 
-export default class SourceTraverseView {
+class SourceTraverseView {
   constructor(serializedState) {
     this.eventEmitter = new EventEmitter();
     // Create root element
@@ -92,3 +92,5 @@ export default class SourceTraverseView {
       </NodeGroup>;
   }
 }
+
+export default SourceTraverseView;
