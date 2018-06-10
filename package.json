@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "babylon": "^6.18.0",
+    "esprima-walk": "^0.1.0",
     "react": "^16.4.0",
     "react-dom": "^16.4.0",
     "recast": "^0.15.0"
