@@ -51,7 +51,7 @@ class SourceTraverseView {
     return this.element;
   }
 
-  update(data) {
+  update(data, activeNode) {
     let node;
     var container = document.createElement("div");
     if (data.error) {
@@ -73,7 +73,7 @@ class SourceTraverseView {
         node = sections;
       }
     }
-    const root = <Container onItemActivate={this._onItemActivate}>{node}</Container>;
+    const root = <Container onItemActivate={this._onItemActivate} activeNode={activeNode}>{node}</Container>;
     ReactDOM.render(root, container);
     this.element.replaceChild(container, this.element.firstChild);
   }

@@ -10,6 +10,7 @@ export default class NodeGroup extends Component {
             child,
             {
               ...child.props,
+              activeNode: this.props.activeNode,
               onItemActivate: this.props.onItemActivate,
             },
             child.props.children,

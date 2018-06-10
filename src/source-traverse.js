@@ -1,6 +1,7 @@
 import SourceTraverseView from './source-traverse-view';
 import { CompositeDisposable } from 'atom';
 import recast from 'recast';
+import walk from 'esprima-walk';
 
 function foo () {}
  function bar () {}
@@ -26,6 +27,7 @@ export default {
     this.view = new SourceTraverseView(state.sourceTraverseViewState);
     this._onItemActivate = this._onItemActivate.bind(this);
     this.view.onItemActivate(this._onItemActivate);
+    this._ast = null;
 
     // Events subscribed to in atom's system can be easily cleaned up with a CompositeDisposable
     this.subscriptions = new CompositeDisposable();
@@ -73,7 +75,7 @@ export default {
     this.update();
   },
 
-  update(){
+  update(activeNode){
     if (!this._activeEditor) {
       this.view.update({
         error: 'No file to parse.',
@@ -91,10 +93,10 @@ export default {
     const data = {};
     try {
       const visitor = this.visit.bind(null, data);
-      const ast = recast.parse(source, {
+      this._ast = recast.parse(source, {
         parser: require("recast/parsers/flow"),
       });
-      recast.visit(ast, nodesToVisit.reduce((acc, name) => {
+      recast.visit(this._ast, nodesToVisit.reduce((acc, name) => {
         acc[`visit${name}`] = visitor;
         return acc;
       }, Object.create(null)));
@@ -105,8 +107,7 @@ export default {
       return;
     }
 
-    this.view.update(data);
-    // this.view.update(data, activeAstNode);  //TODO give reference to an AST Node
+    this.view.update(data, activeNode);
   },
 
   visit(data, path) {
@@ -119,28 +120,24 @@ export default {
   },
 
   getNodeInAstAtCursor(editor, event) {
-    let astText = this.getAstTreeText(editor.getText(editor));
     let pos = event.newBufferPosition;
     //binary search using pos to get to the appropriate point in tree
-    let node = this.getNodeAtPosition(pos.row, pos.column, astText);
-    console.log(node);
+    let node = this.getNodeAtPosition(pos.row, pos.column);
+    if (node) {
+      this.update(node);
+    }
   },
 
-  getAstTreeText(functionText){
+  getNodeAtPosition(row, column){
+    let data = {};
     try {
-      return recast.parse(functionText, {
-        parser: require("recast/parsers/flow")
-      });
+      const visitor = this.cursorAtNode.bind(null, row, column, data);
+      recast.visit(this._ast, nodesToVisit.reduce((acc, name) => {
+        acc[`visit${name}`] = visitor;
+        return acc;
+      }, Object.create(null)));
     } catch (_) {}
-  },
-
-  getNodeAtPosition(row, column, astText){
-    let walk = require( 'esprima-walk' );
-    walk(astText, node => {
-      //todo literals /.*Literal/.test(node.type)
-      this.cursorAtNode(row, column, node);
-    })
-    return "wow";
+    return data.node;
   },
 
   _onItemActivate(node) {
@@ -162,33 +159,29 @@ export default {
     }
   },
 
-  cursorAtNode(row, column, node){
-    if (node.type == 'FunctionDeclaration' || node.type == 'ClassDeclaration' || node.type == 'VariableDeclaration'){  // only look at root nodes
-      // console.log(node);
-      let start = node.loc.start;
-      let end = node.loc.end;
-      if (start.line-1 >= row && end.line-1 <= row){
-        if (end.line-1 == row){
-          if (start.line - 1 == row){
-            if (column <= end.column && column >= start.column){
-              console.log(node);
-            }
-          }
-          else{
-            if (column <= end.column){
-            console.log(node);
-            }
+  cursorAtNode(row, column, data, path){
+    const node = path.value;
+    let start = node.loc.start;
+    let end = node.loc.end;
+    if (start.line-1 >= row && end.line-1 <= row){
+      if (end.line-1 == row){
+        if (start.line - 1 == row){
+          if (column <= end.column && column >= start.column){
+            data.node = node;
           }
         }
-        else if (start.line-1 == row){
-          if (column >= start.column){
-            console.log(node);
+        else{
+          if (column <= end.column){
+            data.node = node;
           }
         }
-        // console.log('following node is for debug:');
-        // console.log(node);
-        // console.log('Current loc is:' + '(' + row + ',' + column +')');
+      }
+      else if (start.line-1 == row){
+        if (column >= start.column){
+          data.node = node;
+        }
       }
     }
+    return false;
   }
 };
