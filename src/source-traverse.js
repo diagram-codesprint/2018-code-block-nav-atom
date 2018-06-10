@@ -42,6 +42,19 @@ export default {
   },
 
   update(editor){
+    if (!editor) {
+      this.view.update({
+        error: 'No file to parse.',
+      });
+      return;
+    }
+    const isJavaScript = /^.*\.js$/.test(editor.getFileName());
+    if (!isJavaScript) {
+      this.view.update({
+        error: 'This is not a JavaScript file.',
+      });
+      return;
+    }
     const source = editor.getText();
     const data = {
       FunctionDeclaration: []

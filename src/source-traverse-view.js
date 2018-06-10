@@ -1,7 +1,8 @@
 import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
-import NodeGroup from './ui/NodeGroup';
+import ErrorMessage from './ui/ErrorMessage';
 import FunctionDeclaration from './ui/FunctionDeclaration';
+import NodeGroup from './ui/NodeGroup';
 
 export default class SourceTraverseView {
 
@@ -42,9 +43,22 @@ export default class SourceTraverseView {
   }
 
   update(data) {
+    let node;
     var container = document.createElement("div");
-    const fnsGroup = this._renderFunctionDeclaration(data.FunctionDeclaration);
-    ReactDOM.render(fnsGroup, container);
+    if (data.error) {
+      node = <ErrorMessage message={data.error} />;
+    } else {
+      const sections = [];
+      if (data.FunctionDeclaration.length > 0) {
+        sections.push( this._renderFunctionDeclaration(data.FunctionDeclaration));
+      }
+      if (sections.length === 0) {
+        node = <ErrorMessage message={"No information to show."} />;
+      } else {
+        node = sections;
+      }
+    }
+    ReactDOM.render(node, container);
 
     this.element.replaceChild(container, this.element.firstChild);
   }
