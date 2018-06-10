@@ -1,7 +1,7 @@
-'use babel';
-
 import SourceTraverseView from './source-traverse-view';
 import { CompositeDisposable } from 'atom';
+import React, {Component} from 'react';
+import ReactDOM from 'react-dom';
 import recast from 'recast';
 
 function foo () {}
@@ -58,15 +58,26 @@ export default {
 
     var out = recast.print(ast).code;
     var container = document.createElement("div");
-    const fnHeading = document.createElement('h2');
-    fnHeading.textContent = 'Functions';
-    container.appendChild(fnHeading);
-    fns.reduce((acc, name) => {
-      const div = document.createElement('div');
-      div.textContent = name;
-      acc.appendChild(div);
-      return acc;
-    }, container);
+    const fnsGroup = <NodeGroupView
+      heading="Functions">
+        {fns.map(name => <FunctionDeclarationView name={name} />)}
+      </NodeGroupView>;
+    ReactDOM.render(fnsGroup, container)
     this.view.addContent(container);
   }
 };
+
+class NodeGroupView extends Component {
+  render() {
+    return <div>
+      <h2>{this.props.heading}</h2>
+      <div>{this.props.children}</div>
+    </div>;
+  }
+}
+
+class FunctionDeclarationView extends Component {
+  render() {
+    return <div>{this.props.name}</div>;
+  }
+}

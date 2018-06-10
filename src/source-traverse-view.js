@@ -1,15 +1,9 @@
-'use babel';
-
 export default class SourceTraverseView {
 
   constructor(serializedState) {
     // Create root element
     this.element = document.createElement('div');
     this.element.classList.add('source-traverse');
-    // Create message element
-    const message = document.createElement('div');
-    message.textContent = 'TBD';
-    this.element.appendChild(message);
   }
 
   getDefaultLocation() {
