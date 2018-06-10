@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
 import Container from './ui/Container';
 import ErrorMessage from './ui/ErrorMessage';
-import EventEmitter from './util/eventEmitter';
+import EventEmitter from './util/EventEmitter';
 import FunctionDeclaration from './ui/FunctionDeclaration';
 import NodeGroup from './ui/NodeGroup';
 
