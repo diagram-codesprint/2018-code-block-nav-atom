@@ -122,10 +122,12 @@ export default {
     } catch (_) {}
   },
 
-  getNodeAtPosition(row, column, AstTree){
-    // debugger;
-    var walk = require( 'esprima-walk' );
-    // walk,
+  getNodeAtPosition(row, column, astText){
+    let walk = require( 'esprima-walk' );
+    walk(astText, node => {
+      //todo literals /.*Literal/.test(node.type)
+      this.cursorAtNode(row, column, node);
+    })
     return "wow";
   },
 
@@ -145,6 +147,36 @@ export default {
         [start.line - 1, start.column],
         [end.line - 1, end.column],
       ]);
+    }
+  },
+
+  cursorAtNode(row, column, node){
+    if (node.type == 'FunctionDeclaration' || node.type == 'ClassDeclaration' || node.type == 'VariableDeclaration'){  // only look at root nodes
+      // console.log(node);
+      let start = node.loc.start;
+      let end = node.loc.end;
+      if (start.line-1 >= row && end.line-1 <= row){
+        if (end.line-1 == row){
+          if (start.line - 1 == row){
+            if (column <= end.column && column >= start.column){
+              console.log(node);
+            }
+          }
+          else{
+            if (column <= end.column){
+            console.log(node);
+            }
+          }
+        }
+        else if (start.line-1 == row){
+          if (column >= start.column){
+            console.log(node);
+          }
+        }
+        // console.log('following node is for debug:');
+        // console.log(node);
+        // console.log('Current loc is:' + '(' + row + ',' + column +')');
+      }
     }
   }
 };
