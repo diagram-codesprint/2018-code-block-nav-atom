@@ -15,7 +15,7 @@ const nodesToVisit = [
   'VariableDeclaration',
 ];
 
-let editorSubscriptions = [], a, b, c;
+let a = [], b, c;
 
 export default {
   view: null,
@@ -29,19 +29,21 @@ export default {
 
     // Events subscribed to in atom's system can be easily cleaned up with a CompositeDisposable
     this.subscriptions = new CompositeDisposable();
+    this._editorSubscriptions = new CompositeDisposable();
 
     // Register command that toggles this view
     this.subscriptions.add(atom.commands.add('atom-workspace', {
       'source-traverse:toggle': () => this.toggle()
     }));
 
-    let fn = this.update.bind(this);
+    let fn = this.onNewEditor.bind(this);
     this.subscriptions.add(atom.workspace.observeActiveTextEditor(fn));
   },
 
   deactivate() {
     this.modalPanel.destroy();
     this.subscriptions.dispose();
+    this._editorSubscriptions.dispose();
     this.view.destroy();
   },
 
@@ -55,20 +57,29 @@ export default {
     atom.workspace.toggle(this.view);
   },
 
-  update(editor){
-    while(editorSubscriptions.length > 0){
-      editorSubscriptions.pop().dispose();
-    }
+  onNewEditor(editor) {
+    this._editorSubscriptions.dispose();
     this._activeEditor = editor;
+    this._editorSubscriptions.add(
+      this._activeEditor.onDidChangeCursorPosition(
+        this.getNodeInAstAtCursor.bind(this, this._activeEditor),
+      ),
+    );
+    this._editorSubscriptions.add(
+      this._activeEditor.onDidStopChanging(
+        this.update.bind(this),
+      ),
+    );
+    this.update();
+  },
+
+  update(){
     if (!this._activeEditor) {
       this.view.update({
         error: 'No file to parse.',
       });
       return;
     }
-    const fn = this.getNodeInAstAtCursor.bind(this, this._activeEditor);
-    const sub = this._activeEditor.onDidChangeCursorPosition(fn);
-    editorSubscriptions.push(sub);
     const isJavaScript = /^.*\.js$/.test(this._activeEditor.getFileName());
     if (!isJavaScript) {
       this.view.update({
