@@ -34,7 +34,7 @@
     "watch": "npm-watch"
   },
   "watch": {
-    "build": "{src,spec}/*.js"
+    "build": "{src,spec}/**/*.js"
   },
   "author": "",
   "devDependencies": {

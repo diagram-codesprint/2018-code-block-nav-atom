@@ -1,9 +1,16 @@
+import React, {Component} from 'react';
+import ReactDOM from 'react-dom';
+import NodeGroup from './ui/NodeGroup';
+import FunctionDeclaration from './ui/FunctionDeclaration';
+
 export default class SourceTraverseView {
 
   constructor(serializedState) {
     // Create root element
     this.element = document.createElement('div');
     this.element.classList.add('source-traverse');
+    const placeholder = document.createElement('div');
+    this.element.appendChild(placeholder);
   }
 
   getDefaultLocation() {
@@ -34,7 +41,17 @@ export default class SourceTraverseView {
     return this.element;
   }
 
-  addContent(content) {
-    this.element.appendChild(content);
+  update(data) {
+    var container = document.createElement("div");
+    const fnsGroup = this._renderFunctionDeclaration(data.FunctionDeclaration);
+    ReactDOM.render(fnsGroup, container);
+
+    this.element.replaceChild(container, this.element.firstChild);
+  }
+
+  _renderFunctionDeclaration(items) {
+    return <NodeGroup heading="Functions">
+        {items.map(name => <FunctionDeclaration name={name} />)}
+      </NodeGroup>;
   }
 }

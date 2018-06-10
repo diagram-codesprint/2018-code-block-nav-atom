@@ -1,7 +1,5 @@
 import SourceTraverseView from './source-traverse-view';
 import { CompositeDisposable } from 'atom';
-import React, {Component} from 'react';
-import ReactDOM from 'react-dom';
 import recast from 'recast';
 
 function foo () {}
@@ -45,39 +43,19 @@ export default {
 
   update(editor){
     const source = editor.getText();
-    const fns = [];
+    const data = {
+      FunctionDeclaration: []
+    };
     const ast = recast.parse(source, {
       parser: require("recast/parsers/flow"),
     });
     recast.visit(ast, {
       visitFunctionDeclaration: function (path) {
-        fns.push(path.value.id.name);
+        data.FunctionDeclaration.push(path.value.id.name);
         this.traverse(path);
       },
     });
 
-    var out = recast.print(ast).code;
-    var container = document.createElement("div");
-    const fnsGroup = <NodeGroupView
-      heading="Functions">
-        {fns.map(name => <FunctionDeclarationView name={name} />)}
-      </NodeGroupView>;
-    ReactDOM.render(fnsGroup, container)
-    this.view.addContent(container);
+    this.view.update(data);
   }
 };
-
-class NodeGroupView extends Component {
-  render() {
-    return <div>
-      <h2>{this.props.heading}</h2>
-      <div>{this.props.children}</div>
-    </div>;
-  }
-}
-
-class FunctionDeclarationView extends Component {
-  render() {
-    return <div>{this.props.name}</div>;
-  }
-}
