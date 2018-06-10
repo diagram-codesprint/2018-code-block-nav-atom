@@ -5,13 +5,17 @@ import FunctionDeclaration from './ui/FunctionDeclaration';
 import NodeGroup from './ui/NodeGroup';
 
 export default class SourceTraverseView {
-
   constructor(serializedState) {
     // Create root element
     this.element = document.createElement('div');
     this.element.classList.add('source-traverse');
     const placeholder = document.createElement('div');
     this.element.appendChild(placeholder);
+    // Formatters
+    this.formatters = {
+      ClassDeclaration: this._renderClassDeclaration,
+      FunctionDeclaration: this._renderFunctionDeclaration,
+    }
   }
 
   getDefaultLocation() {
@@ -49,8 +53,14 @@ export default class SourceTraverseView {
       node = <ErrorMessage message={data.error} />;
     } else {
       const sections = [];
-      if (data.FunctionDeclaration.length > 0) {
-        sections.push( this._renderFunctionDeclaration(data.FunctionDeclaration));
+      for (let name of Object.keys(data)) {
+        if (this.formatters[name]) {
+          if (data[name].length > 0) {
+            sections.push(this.formatters[name](data[name]));
+          }
+        } else {
+          throw new Error('Missing a formatter for \`' + name + '\`.');
+        }
       }
       if (sections.length === 0) {
         node = <ErrorMessage message={"No information to show."} />;
@@ -63,9 +73,14 @@ export default class SourceTraverseView {
     this.element.replaceChild(container, this.element.firstChild);
   }
 
-  _renderFunctionDeclaration(items) {
+  _renderClassDeclaration(nodes) {
+    return <NodeGroup heading="Classes">
+        {nodes.map(node => <FunctionDeclaration node={node} />)}
+      </NodeGroup>;
+  }
+  _renderFunctionDeclaration(nodes) {
     return <NodeGroup heading="Functions">
-        {items.map(name => <FunctionDeclaration name={name} />)}
+        {nodes.map(node => <FunctionDeclaration node={node} />)}
       </NodeGroup>;
   }
 }

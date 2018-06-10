@@ -6,7 +6,10 @@ export default class FunctionDeclaration extends Component {
     this._click = this._click.bind(this);
   }
   render() {
-    return <div onClick={this._click}>{this.props.name}</div>;
+    const {
+      node,
+    } = this.props;
+    return <div onClick={this._click}>{node.id.name}</div>;
   }
 
   _click() {

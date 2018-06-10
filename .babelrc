@@ -2,10 +2,13 @@
 "presets": [
     "es2015",
     "react",
-    "stage-0"
+    "stage-0",
   ],
   "plugins": [
+    "transform-es2015-for-of",
     "transform-object-rest-spread",
-    "add-module-exports"
+    "transform-es2015-destructuring",
+    "transform-es2015-template-literals",
+    "add-module-exports",
   ]
 }

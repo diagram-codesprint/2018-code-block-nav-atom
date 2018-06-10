@@ -5,6 +5,12 @@ import recast from 'recast';
 function foo () {}
 function bar () {}
 function baz () {}
+class Biz {}
+
+const nodesToVisit = [
+  'ClassDeclaration',
+  'FunctionDeclaration',
+];
 
 export default {
   view: null,
@@ -56,19 +62,32 @@ export default {
       return;
     }
     const source = editor.getText();
-    const data = {
-      FunctionDeclaration: []
-    };
-    const ast = recast.parse(source, {
-      parser: require("recast/parsers/flow"),
-    });
-    recast.visit(ast, {
-      visitFunctionDeclaration: function (path) {
-        data.FunctionDeclaration.push(path.value.id.name);
-        this.traverse(path);
-      },
-    });
+    const data = {};
+    try {
+      const visitor = this.visit.bind(null, data);
+      const ast = recast.parse(source, {
+        parser: require("recast/parsers/flow"),
+      });
+      recast.visit(ast, nodesToVisit.reduce((acc, name) => {
+        acc[`visit${name}`] = visitor;
+        return acc;
+      }, Object.create(null)));
+    } catch (error) {
+      this.view.update({
+        error: error.message,
+      });
+      return;
+    }
 
     this.view.update(data);
+  },
+
+  visit(data, path) {
+    const node = path.value;
+    if (!data[node.type]) {
+      data[node.type] = [];
+    }
+    data[node.type].push(node);
+    return false;
   }
 };
