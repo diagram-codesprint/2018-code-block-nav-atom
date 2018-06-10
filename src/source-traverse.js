@@ -12,9 +12,10 @@ class Biz {
 const nodesToVisit = [
   'ClassDeclaration',
   'FunctionDeclaration',
+  'VariableDeclaration',
 ];
 
-let editorSubscriptions = [];
+let editorSubscriptions = [], a, b, c;
 
 export default {
   view: null,
@@ -143,7 +144,7 @@ export default {
       end,
     } = loc;
     if (this._activeEditor) {
-      this._activeEditor.setSelectedScreenRange([
+      this._activeEditor.setSelectedBufferRange([
         [start.line - 1, start.column],
         [end.line - 1, end.column],
       ]);

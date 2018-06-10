@@ -4,6 +4,7 @@ import Container from './ui/Container';
 import ErrorMessage from './ui/ErrorMessage';
 import EventEmitter from './util/EventEmitter';
 import FunctionDeclaration from './ui/FunctionDeclaration';
+import VariableDeclaration from './ui/VariableDeclaration';
 import NodeGroup from './ui/NodeGroup';
 
 class SourceTraverseView {
@@ -18,6 +19,7 @@ class SourceTraverseView {
     this.formatters = {
       ClassDeclaration: this._renderClassDeclaration,
       FunctionDeclaration: this._renderFunctionDeclaration,
+      VariableDeclaration: this._renderVariableDeclaration,
     }
   }
 
@@ -76,7 +78,7 @@ class SourceTraverseView {
     this.element.replaceChild(container, this.element.firstChild);
   }
   onItemActivate(callback) {
-    this.eventEmitter.on('itemactivate', callback);
+    return this.eventEmitter.on('itemactivate', callback);
   }
   _onItemActivate = (item) => {
     this.eventEmitter.emit('itemactivate', item);
@@ -90,6 +92,11 @@ class SourceTraverseView {
     return <NodeGroup heading="Functions">
         {nodes.map(node => <FunctionDeclaration node={node} />)}
       </NodeGroup>;
+  }
+  _renderVariableDeclaration(nodes) {
+    return <NodeGroup heading="Variable Declarations">
+      {nodes.map(node => <VariableDeclaration node={node} />)}
+    </NodeGroup>;
   }
 }
 

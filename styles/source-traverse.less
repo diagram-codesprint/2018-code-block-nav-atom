@@ -4,21 +4,33 @@
 // for a full listing of what's available.
 @import "ui-variables";
 
-button {
+.source-traverse button {
   background: none;
   border: none;
-}
-
-button:hover,
-button:focus {
-  text-decoration: underline;
-}
-
-ol, ul {
-  list-style: none;
-  -webkit-padding-start: 0;
+  color: blue;
+  line-height: initial;
+  padding: 0;
 }
 
 .source-traverse {
   padding: 0 0.75em;
+}
+
+.source-traverse button:hover,
+.source-traverse button:focus {
+  text-decoration: underline;
+}
+
+.source-traverse ol,
+.source-traverse ul {
+  list-style: none;
+  -webkit-padding-start: 0;
+}
+.source-traverse--nodes__variable-declaration {
+  padding-top: 0.5em
+}
+
+.source-traverse--nodes__variable-declaration-item:nth-child(n + 2) .source-traverse--nodes__variable-declaration-kind {
+  color: gray;
+  -webkit-padding-start: 0.5em;
 }
