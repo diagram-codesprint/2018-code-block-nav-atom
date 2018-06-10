@@ -58,8 +58,8 @@ export default class SourceTraverseView {
         node = sections;
       }
     }
-    ReactDOM.render(node, container);
 
+    ReactDOM.render(node, container);
     this.element.replaceChild(container, this.element.firstChild);
   }
 
