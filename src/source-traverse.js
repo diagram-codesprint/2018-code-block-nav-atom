@@ -12,6 +12,8 @@ const nodesToVisit = [
   'FunctionDeclaration',
 ];
 
+let editorSubscriptions = [];
+
 export default {
   view: null,
   subscriptions: null,
@@ -54,6 +56,13 @@ export default {
       });
       return;
     }
+    while(editorSubscriptions.length > 0){
+      const sub = editorSubscriptions.pop();
+      sub.dispose();
+    }
+    const fn = this.getNodeInAstAtCursor.bind(this, editor);
+    const sub = editor.onDidChangeCursorPosition(fn);
+    editorSubscriptions.push(sub);
     const isJavaScript = /^.*\.js$/.test(editor.getFileName());
     if (!isJavaScript) {
       this.view.update({
@@ -80,6 +89,7 @@ export default {
     }
 
     this.view.update(data);
+    // this.view.update(data, activeAstNode);  //TODO give reference to an AST Node
   },
 
   visit(data, path) {
@@ -89,5 +99,28 @@ export default {
     }
     data[node.type].push(node);
     return false;
+  },
+
+  getNodeInAstAtCursor(editor, event) {
+    let astText = this.getAstTreeText(editor.getText(editor));
+    let pos = event.newBufferPosition;
+    //binary search using pos to get to the appropriate point in tree
+    let node = this.getNodeAtPosition(pos.row, pos.column, astText);
+    console.log(node);
+  },
+
+
+  getAstTreeText(functionText){
+    return recast.parse(functionText, {
+      parser: require("recast/parsers/flow")
+    })
+  },
+
+  getNodeAtPosition(row, column, AstTree){
+    // debugger;
+    var walk = require( 'esprima-walk' );
+    // walk,
+    return "wow";
   }
+
 };
