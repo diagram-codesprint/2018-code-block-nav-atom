@@ -1,11 +1,14 @@
 import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
+import Container from './ui/Container';
 import ErrorMessage from './ui/ErrorMessage';
+import EventEmitter from './util/eventEmitter';
 import FunctionDeclaration from './ui/FunctionDeclaration';
 import NodeGroup from './ui/NodeGroup';
 
 export default class SourceTraverseView {
   constructor(serializedState) {
+    this.eventEmitter = new EventEmitter();
     // Create root element
     this.element = document.createElement('div');
     this.element.classList.add('source-traverse');
@@ -68,11 +71,16 @@ export default class SourceTraverseView {
         node = sections;
       }
     }
-
-    ReactDOM.render(node, container);
+    const root = <Container onItemActivate={this._onItemActivate}>{node}</Container>;
+    ReactDOM.render(root, container);
     this.element.replaceChild(container, this.element.firstChild);
   }
-
+  onItemActivate(callback) {
+    this.eventEmitter.on('itemactivate', callback);
+  }
+  _onItemActivate = (item) => {
+    this.eventEmitter.emit('itemactivate', item);
+  }
   _renderClassDeclaration(nodes) {
     return <NodeGroup heading="Classes">
         {nodes.map(node => <FunctionDeclaration node={node} />)}

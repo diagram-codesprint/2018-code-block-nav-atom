@@ -20,6 +20,7 @@ export default {
 
   activate(state) {
     this.view = new SourceTraverseView(state.sourceTraverseViewState);
+    this.view.onItemActivate(this._onItemActivate);
 
     // Events subscribed to in atom's system can be easily cleaned up with a CompositeDisposable
     this.subscriptions = new CompositeDisposable();
@@ -109,7 +110,6 @@ export default {
     console.log(node);
   },
 
-
   getAstTreeText(functionText){
     return recast.parse(functionText, {
       parser: require("recast/parsers/flow")
@@ -121,6 +121,9 @@ export default {
     var walk = require( 'esprima-walk' );
     // walk,
     return "wow";
-  }
+  },
 
+  _onItemActivate(node) {
+    console.log(node);
+  }
 };

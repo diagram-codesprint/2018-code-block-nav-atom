@@ -1,18 +1,14 @@
 import React, {Component} from 'react';
 
 export default class FunctionDeclaration extends Component {
-  constructor(props) {
-    super(props);
-    this._click = this._click.bind(this);
-  }
   render() {
     const {
       node,
     } = this.props;
-    return <div onClick={this._click}>{node.id.name}</div>;
+    return <li><button onClick={this._click}>{node.id.name}</button></li>;
   }
 
-  _click() {
-    console.log(this.props.name);
-  }
+  _click = () => {
+    this.props.onItemActivate(this.props.node);
+  };
 }
