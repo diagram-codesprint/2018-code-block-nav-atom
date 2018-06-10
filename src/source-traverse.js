@@ -17,9 +17,11 @@ let editorSubscriptions = [];
 export default {
   view: null,
   subscriptions: null,
+  _activeEditor: null,
 
   activate(state) {
     this.view = new SourceTraverseView(state.sourceTraverseViewState);
+    this._onItemActivate = this._onItemActivate.bind(this);
     this.view.onItemActivate(this._onItemActivate);
 
     // Events subscribed to in atom's system can be easily cleaned up with a CompositeDisposable
@@ -51,27 +53,27 @@ export default {
   },
 
   update(editor){
-    if (!editor) {
+    while(editorSubscriptions.length > 0){
+      editorSubscriptions.pop().dispose();
+    }
+    this._activeEditor = editor;
+    if (!this._activeEditor) {
       this.view.update({
         error: 'No file to parse.',
       });
       return;
     }
-    while(editorSubscriptions.length > 0){
-      const sub = editorSubscriptions.pop();
-      sub.dispose();
-    }
-    const fn = this.getNodeInAstAtCursor.bind(this, editor);
-    const sub = editor.onDidChangeCursorPosition(fn);
+    const fn = this.getNodeInAstAtCursor.bind(this, this._activeEditor);
+    const sub = this._activeEditor.onDidChangeCursorPosition(fn);
     editorSubscriptions.push(sub);
-    const isJavaScript = /^.*\.js$/.test(editor.getFileName());
+    const isJavaScript = /^.*\.js$/.test(this._activeEditor.getFileName());
     if (!isJavaScript) {
       this.view.update({
         error: 'This is not a JavaScript file.',
       });
       return;
     }
-    const source = editor.getText();
+    const source = this._activeEditor.getText();
     const data = {};
     try {
       const visitor = this.visit.bind(null, data);
@@ -111,9 +113,11 @@ export default {
   },
 
   getAstTreeText(functionText){
-    return recast.parse(functionText, {
-      parser: require("recast/parsers/flow")
-    })
+    try {
+      return recast.parse(functionText, {
+        parser: require("recast/parsers/flow")
+      });
+    } catch (_) {}
   },
 
   getNodeAtPosition(row, column, AstTree){
@@ -124,6 +128,17 @@ export default {
   },
 
   _onItemActivate(node) {
-    console.log(node);
+    if (node.loc) {
+      const {
+        start,
+        end,
+      } = node.loc;
+      if (this._activeEditor) {
+        this._activeEditor.setSelectedScreenRange([
+          [start.line - 1, start.column],
+          [end.line - 1, end.column],
+        ]);
+      }
+    }
   }
 };
